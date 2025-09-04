@@ -1,9 +1,12 @@
+import uuid, os
+from celery.result import AsyncResult
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
-import uuid, os
 
-from pathlib import Path
+
 from models import EnqueueResponse
+from tasks import celery_app, generate_visitor_pack
 
 ARTIFACTS = Path(os.environ.get('ARTIFACTS_DIR'), '/artifacts')
 app = FastAPI(title='Backend Portfolio')
@@ -32,6 +35,7 @@ async def generate_pack(request: Request):
 
 @app.get("/jobs/{job_id}")
 def job_status(job_id: str):
+    # this polls by hitting redis
     res: AsyncResult = celery_app.AsyncResult(job_id)
     return {"job_id": job_id, "state": res.state}
 

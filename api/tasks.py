@@ -39,4 +39,5 @@ def generate_visitor_pack(self, visitor: dict) -> dict:
     )
     pdf_path = outdir / "visitor.pdf"
 
+    # this goes to redis, not the return value of the invocation in the API endpoint
     return {"xlsx": str(xlsx_path), "pdf": str(pdf_path)}
