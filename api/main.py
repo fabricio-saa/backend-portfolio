@@ -3,6 +3,7 @@ from celery.result import AsyncResult
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
+from fastapi.exceptions import HTTPException
 
 
 from models import EnqueueResponse
@@ -39,6 +40,7 @@ def job_status(job_id: str):
     res: AsyncResult = celery_app.AsyncResult(job_id)
     return {"job_id": job_id, "state": res.state}
 
+# same job could output to different formats
 @app.get("/jobs/{job_id}/downloads")
 def list_downloads(job_id: str):
     folder = ARTIFACTS / job_id
@@ -49,6 +51,7 @@ def list_downloads(job_id: str):
         raise HTTPException(404, "Not ready")
     return {"job_id": job_id, "files": files}
 
+# download the file you want based on the file listed by endpoint above
 @app.get("/download/{job_id}/{filename}")
 def download(job_id: str, filename: str):
     path = ARTIFACTS / job_id / filename
