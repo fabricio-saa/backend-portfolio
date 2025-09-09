@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fabricio — Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="{{ url_for('static', path='styles.css') }}" rel="stylesheet" />
+  </head>
+  <body>
+    <main>
+      <h1>Fabricio</h1>
+      <p>Email: <a href="mailto:{{ email }}">{{ email }}</a></p>
+      <ul>
+        {% for link in links %}
+          <li><a href="{{ link.href }}" target="_blank" rel="noopener">{{ link.label }}</a></li>
+        {% endfor %}
+      </ul>
+    </main>
+  </body>
+</html>
