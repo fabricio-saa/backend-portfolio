@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - ARTIFACTS_DIR=/artifacts
+    volumes:
+      - artifacts:/artifacts
+    ports: ["8080:8080"]
+    depends_on: [redis]
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - ARTIFACTS_DIR=/artifacts
+    volumes:
+      - artifacts:/artifacts
+    depends_on: [redis]
+
+volumes:
+  artifacts:
