@@ -13,8 +13,8 @@ from api.tasks import celery_app, generate_visitor_pack
 
 ARTIFACTS = Path(os.environ.get('ARTIFACTS_DIR'), '/artifacts')
 app = FastAPI(title='Backend Portfolio')
-app.mount("api/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory='templates')
+app.mount("/static", StaticFiles(directory="api/static"), name="static")
+templates = Jinja2Templates(directory='api/templates')
 
 
 @app.get("/", response_class=HTMLResponse)
