@@ -5,6 +5,10 @@ function toggleButtonState() {
     button.disabled = !button.disabled;
 }
 
+function sleep(ms) {
+    return new Promise((res) => setTimeout(res, ms))
+}
+
 async function startVisitorPack() {
     toggleButtonState();
     const res = await fetch("/actions/generate-visitor-pack", {
@@ -41,7 +45,7 @@ async function pollJob(jobId) {
 
         // exponential backoff with jitter
         const delay = Math.min(maxDelay, 500 * Math.pow(1.6, attempt++)) + Math.random() * 300;
-        await new Promise(r => setTimeout(r, delay));
+        await sleep(delay);
     }
 }
 
@@ -61,8 +65,8 @@ async function getDownloadsOnceReady(jobId) {
     for (let attempt = 0; attempt < 5; attempt++) {
         const r = await fetch(`/jobs/${jobId}/downloads`, { cache: "no-store" });
         if (r.ok) {
-            const { files = [] } = await r.json();
-            if (files.length) {
+            const { files = {} } = await r.json();
+            if (Object.keys(files).length) {
                 return files;
             }
         }
