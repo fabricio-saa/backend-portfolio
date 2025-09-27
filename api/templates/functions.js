@@ -14,11 +14,13 @@ async function pollJob(jobId) {
     const maxDelay = 8000; // cap at 8s
     while (true) {
         const res = await fetch(`/jobs/${jobId}`, { cache: "no-store" });
-        if (!res.ok) throw new Error("Status endpoint failed");
+        if (!res.ok){
+            throw new Error("Status endpoint failed");
+        }
         const data = await res.json();
 
         // Update UI with data.state
-       updateUI(data);
+        await updateUI(data);
 
         if (data.state === "SUCCESS") {
             break;
