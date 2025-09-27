@@ -7,7 +7,7 @@ function toggleButtonState() {
 
 async function startVisitorPack() {
     toggleButtonState();
-    const res = await fetch("/actions/generrate-visitor-pack", {
+    const res = await fetch("/actions/generate-visitor-pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
@@ -45,7 +45,7 @@ async function pollJob(jobId) {
     }
 }
 
-async function updateStatusUI({ state, job_id }) {
+async function updateUI({ state, job_id }) {
     const el = document.getElementById("status");
     el.textContent = `Job #${job_id}: ${state}`;
     if (state === 'SUCCESS' && !seenDownloads.has(job_id)) {
