@@ -7,13 +7,13 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.exceptions import HTTPException
 from starlette.templating import Jinja2Templates
 
-from models import EnqueueResponse
-from tasks import celery_app, generate_visitor_pack
+from api.models import EnqueueResponse
+from api.tasks import celery_app, generate_visitor_pack
 
 
 ARTIFACTS = Path(os.environ.get('ARTIFACTS_DIR'), '/artifacts')
 app = FastAPI(title='Backend Portfolio')
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("api/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory='templates')
 
 
