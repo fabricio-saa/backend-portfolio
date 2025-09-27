@@ -15,6 +15,56 @@
           <li><a href="{{ link.href }}" target="_blank" rel="noopener">{{ link.label }}</a></li>
         {% endfor %}
       </ul>
+      <button onclick="startVisitorPack()">Send me a visitor report</button>
+      <p id="status"></p>
     </main>
   </body>
+  <script>
+    async function startVisitorPack() {
+      const res = await fetch("/actions/generrate-visitor-pack", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({}),
+      });
+      if (!res.ok) throw new Error("Failed to start");
+      const job = await res.json();
+      return pollJob(job.job_id);
+    }
+
+    async function pollJob(jobId) {
+      let attempt = 0;
+      const maxDelay = 8000; // cap at 8s
+      while (true) {
+        const res = await fetch(`/jobs/${jobId}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("Status endpoint failed");
+        const data = await res.json();
+      
+        // Update UI with data.state, data.progress, data.detail
+        renderStatus(data);
+      
+        if (data.state === "SUCCESS" && data.downloads) {
+          return data; // done -> contains {downloads: {xlsx, pdf}}
+        }
+        if (data.state === "FAILURE") {
+          throw new Error(data.detail || "Job failed");
+        }
+      
+        // exponential backoff with jitter
+        const delay = Math.min(maxDelay, 500 * Math.pow(1.6, attempt++)) + Math.random() * 300;
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+
+    function renderStatus({state, downloads}) {
+      // TODO: your UI. Example:
+      const el = document.getElementById("status");
+      el.textContent = state;
+      if (downloads) {
+        document.getElementById("link-xlsx").href = downloads.xlsx;
+        document.getElementById("link-pdf").href = downloads.pdf;
+        document.getElementById("downloads").style.display = "block";
+      }
+    }
+</script>
+
 </html>
